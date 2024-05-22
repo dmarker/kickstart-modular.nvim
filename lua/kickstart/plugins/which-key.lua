@@ -29,6 +29,9 @@ return {
         ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
         ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
         ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+        -- ['<leader>;'] = { '<cmd>NvimTreeToggle<CR>', 'show/hide NvimTree' },
+        -- This is what "neo-tree" uses and maybe would future proof me from conflict?
+        ['\\'] = { '<cmd>NvimTreeToggle<CR>', 'show/hide NvimTree' },
       }
       -- visual mode
       require('which-key').register({

@@ -1,20 +1,21 @@
+local deps = {
+  -- Automatically install LSPs and related tools to stdpath for Neovim
+  { 'williamboman/mason.nvim', config = true },
+  'williamboman/mason-lspconfig.nvim',
+  'WhoIsSethDaniel/mason-tool-installer.nvim',
+
+  -- Useful status updates for LSP.
+  -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+  { 'j-hui/fidget.nvim', opts = {} },
+}
+if vim.g.sysname ~= 'FreeBSD' then
+  table.insert(deps, { 'folke/neodev.nvim', opts = {} })
+end
+
 return {
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
-    dependencies = {
-      -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-      'williamboman/mason-lspconfig.nvim',
-      'WhoIsSethDaniel/mason-tool-installer.nvim',
-
-      -- Useful status updates for LSP.
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
-
-      -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/neodev.nvim', opts = {} },
-    },
+    dependencies = deps,
     config = function()
       -- Brief aside: **What is LSP?**
       --
@@ -131,11 +132,11 @@ return {
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-            map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-            end, '[T]oggle Inlay [H]ints')
-          end
+          --if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+          --  map('<leader>th', function()
+          --    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+          --  end, '[T]oggle Inlay [H]ints')
+          --end
         end,
       })
 
@@ -168,8 +169,10 @@ return {
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
-
-        lua_ls = {
+      }
+      if vim.g.sysname ~= 'FreeBSD' then
+        -- only add lua when not on FreeBSD
+        servers.lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
           -- capabilities = {},
@@ -182,8 +185,8 @@ return {
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
-        },
-      }
+        }
+      end
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
@@ -196,9 +199,11 @@ return {
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
-      })
+      if vim.g.sysname ~= 'FreeBSD' then
+        vim.list_extend(ensure_installed, {
+          'stylua', -- Used to format Lua code
+        })
+      end
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
@@ -213,6 +218,8 @@ return {
           end,
         },
       }
+
+      vim.filetype.add { extension = { templ = 'templ' } } -- so we get templ
     end,
   },
 }
