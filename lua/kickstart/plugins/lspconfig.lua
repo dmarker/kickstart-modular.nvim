@@ -1,4 +1,22 @@
 -- LSP Plugins
+local deps = {
+  -- Automatically install LSPs and related tools to stdpath for Neovim
+  { 'williamboman/mason.nvim', config = true },
+  'williamboman/mason-lspconfig.nvim',
+  'WhoIsSethDaniel/mason-tool-installer.nvim',
+
+  -- Useful status updates for LSP.
+  -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+  { 'j-hui/fidget.nvim', opts = {} },
+
+  -- Allows extra capabilities provided by nvim-cmp
+  'hrsh7th/cmp-nvim-lsp',
+}
+-- no longer needed but leaving commented out for next time something is added
+-- if vim.g.sysname ~= 'FreeBSD' then
+--   table.insert(deps, { 'folke/neodev.nvim', opts = {} })
+-- end
+
 return {
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -16,19 +34,7 @@ return {
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
-    dependencies = {
-      -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-      'williamboman/mason-lspconfig.nvim',
-      'WhoIsSethDaniel/mason-tool-installer.nvim',
-
-      -- Useful status updates for LSP.
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
-
-      -- Allows extra capabilities provided by nvim-cmp
-      'hrsh7th/cmp-nvim-lsp',
-    },
+    dependencies = deps,
     config = function()
       -- Brief aside: **What is LSP?**
       --
@@ -141,11 +147,11 @@ return {
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-            map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, '[T]oggle Inlay [H]ints')
-          end
+          -- if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+          --   map('<leader>th', function()
+          --     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+          --   end, '[T]oggle Inlay [H]ints')
+          -- end
         end,
       })
 
@@ -178,8 +184,10 @@ return {
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
-
-        lua_ls = {
+      }
+      if vim.g.sysname ~= 'FreeBSD' then
+        -- only add lua when not on FreeBSD
+        servers.lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
           -- capabilities = {},
@@ -192,9 +200,8 @@ return {
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
-        },
-      }
-
+        }
+      end
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
       --  other tools, you can run
@@ -206,9 +213,11 @@ return {
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
-      })
+      if vim.g.sysname ~= 'FreeBSD' then
+        vim.list_extend(ensure_installed, {
+          'stylua', -- Used to format Lua code
+        })
+      end
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
@@ -223,6 +232,13 @@ return {
           end,
         },
       }
+
+      -- The Janet LSP I'm using is part of 'neovim/nvim-lspconfig', but it is
+      -- not in Mason. So run setup manually. Probably should only do for a buffer
+      -- that is for Janet not in general like this.
+      require('lspconfig').janet_lsp.setup {}
+
+      vim.filetype.add { extension = { templ = 'templ' } } -- so we get templ
     end,
   },
 }

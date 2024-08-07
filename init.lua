@@ -66,7 +66,7 @@ Kickstart Guide:
     MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
     which is very useful when you're not exactly sure of what you're looking for.
 
-  I have left several `:help X` comments throughout the init.lua
+    I have left several `:help X` comments throughout the init.lua
     These are hints about where to find more information about the relevant settings,
     plugins or Neovim features used in Kickstart.
 
@@ -90,8 +90,28 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- disable netrw (this is for nvim-tree)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
+
+-- Need to know if we are on FreeBSD in several places as nvim support sucks a big old dick.
+vim.g.sysname = vim.uv.os_uname().sysname
+
+-- FreeBSD uses gmake not make
+-- But this doesn't seem to help at all, we need MAKE in environment?
+if vim.g.sysname == 'FreeBSD' then
+  vim.g.makeprg = '/usr/local/bin/gmake'
+end
+
+-- disable for FreeBSD
+vim.g.lazydev_enabled = vim.g.sysname ~= 'FreeBSD'
+
+-- remove providers I don't care about for clean :checkhealth
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
 
 -- [[ Setting options ]]
 require 'options'
