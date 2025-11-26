@@ -13,16 +13,17 @@
 -- options to `gitsigns.nvim`.
 --
 -- See `:help gitsigns` to understand what the configuration keys do
+local icons = require 'custom.icons'
 return {
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
       signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
+        add = { text = icons.git.LineAdded },
+        change = { text = icons.git.LineModified },
+        delete = { text = icons.git.LineRemoved },
+        topdelete = { text = icons.git.LineTopRemoved },
+        changedelete = { text = icons.git.LineChangeRemoved },
       },
       on_attach = function(bufnr)
         local gitsigns = require 'gitsigns'
@@ -74,6 +75,12 @@ return {
         map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
         map('n', '<leader>tD', gitsigns.preview_hunk_inline, { desc = '[T]oggle git show [D]eleted' })
       end,
+
+      watch_gitdir = {
+        interval = 1000,
+        follow_files = true,
+      },
+      attach_to_untracked = true,
     },
   },
 }
