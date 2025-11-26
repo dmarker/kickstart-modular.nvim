@@ -1,3 +1,49 @@
+# WARNING
+
+I typically have just one commit on top of the real kickstart repo.
+And I destroy and recreate that commit as I re-sync.
+
+I do this to let the kickstart people handle the basic changes as plugins
+break for whatever reasons. I then go in and fix the things I added in
+lua/custom/plugins:
+    bufferline, nvim-tree, toggleterm
+
+kickstart + those 3 plugins and I don't even use tmux anymore.
+
+But the warning is here because if you clone this to get nvim up on FreeBSD
+don't expect to `git pull` to update. I use `git reset --hard` to scrape my
+change off and re-apply. Sometimes things have changed enough that is the
+easiest way to update anyway.
+
+I use this for macos and FreeBSD. I no longer use mason (it never worked
+with FreeBSD anyway so its dead to me). You must install your LSP via
+packaging.
+
+Enable at bottom of init.lua
+
+lua/custom/plugins/luarocks.lua is used for non-FreeBSD systems only.
+At present the pyvim is broken on macos.
+
+macos:
+```
+brew install gopls lua-language-server pyvim stylua superhtml \
+    templ tree-sitter-cli zls
+```
+
+freebsd (quite a few of these are not merged and only exist in my github):
+```
+pkg install gopls janet-lsp llvm20 lua-language-server lua51-luarocks py312-pynvim stylua \
+    superhtml templ-go tree-sitter-cli zls
+```
+
+Except you must build lua51-luarocks in `devel/lua-luarocks`. And you need to select `LUAJIT`,
+which is why you have to build it from your ports. You can also add to your make.conf(5):
+```
+devel_lua-luarocks_SET= LUAJIT
+```
+Even rust-nightly won't build the simd stuff for blink_cmp_fuzzy. But you still get other
+benefits so I leave it installed.
+
 # kickstart-modular.nvim
 
 ## Introduction

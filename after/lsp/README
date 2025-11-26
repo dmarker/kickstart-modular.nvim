@@ -1,0 +1,6 @@
+We already grab base settings with `neovim/nvim-lspconfig` so any file here
+should only alter things. For example `devel/llvm20` installs `clangd20`.
+
+I altered the lua_ls to be how kickstart altered it.
+
+Mason has been ripped out. Just enable whichever servers you want in init.lua.

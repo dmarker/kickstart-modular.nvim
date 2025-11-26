@@ -90,8 +90,30 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- disable netrw (this is for nvim-tree)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
+
+-- Need to know if we are on FreeBSD in several places.
+vim.g.sysname = vim.uv.os_uname().sysname
+
+-- FreeBSD uses gmake not make
+-- But this doesn't seem to help at all, we need MAKE in environment?
+-- pyvim package on homebrew is broken now and doesn't import.
+if vim.g.sysname == 'FreeBSD' then
+  vim.g.makeprg = '/usr/local/bin/gmake'
+  vim.g.python3_host_prog = '/usr/local/bin/python3'
+else
+  vim.g.makeprg = 'make'
+  vim.g.loaded_python_provider = 0
+end
+
+-- remove providers I don't care about for clean :checkhealth
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
 
 -- [[ Setting options ]]
 require 'options'
@@ -104,6 +126,27 @@ require 'lazy-bootstrap'
 
 -- [[ Configure and install plugins ]]
 require 'lazy-plugins'
+
+-- removed mason. if you want an lsp, add it here after installing
+-- it with your system package manager.
+-- Look in ~/.local/share/nvim/lazy/nvim-lspconfig/lsp/
+--
+--
+vim.lsp.enable {
+  'clangd', -- devel/llvm20 -> must have after/lsp/clangd.lua
+  'gopls', -- devel/gopls
+  'janet_lsp', -- devel/janet-lsp (port not yet merged)
+  'lua_ls', -- devel/lua-language-server (port not yet merged)
+  -- 'rust_analyzer', -- devel/rust-analyzer
+  'superhtml', -- devel/superhtml (port not yet merged)
+  'templ', -- devel/templ-go (port not yet merged)
+  'zls', -- devel/zls
+}
+
+vim.diagnostic.enable = true
+vim.diagnostic.config {
+  virtual_lines = { current_line = true },
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
