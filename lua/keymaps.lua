@@ -58,6 +58,9 @@ vim.filetype.add {
   },
 }
 
+-- lazygit
+kmap('n', '<leader>lg', ':LazyGit<CR>', { desc = "LazyGit" })
+
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- kmap("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
 -- kmap("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
